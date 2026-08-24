@@ -1,0 +1,32 @@
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors
+.vscode/
+.idea/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Generated and temporary files
+node_modules/
+dist/
+coverage/
+*.log
+*.tmp
+*.bak
+validation-*.png
+__pycache__/
+.pytest_cache/
+.cache/
+*.swp
+*.swo
+*.orig
+test-results/
+playwright-report/

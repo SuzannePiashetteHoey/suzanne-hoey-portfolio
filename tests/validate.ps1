@@ -3,7 +3,7 @@ $root = Split-Path -Parent $PSScriptRoot
 $html = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'index.html')
 $css = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'styles.css')
 
-foreach ($file in @('index.html','styles.css','favicon.svg','robots.txt','README.md','docs/SECURITY.md','assets/portfolio-desktop.png','assets/portfolio-mobile.png')) {
+foreach ($file in @('index.html','styles.css','favicon.svg','robots.txt','sitemap.xml','README.md','docs/SECURITY.md','assets/portfolio-desktop.png','assets/portfolio-mobile.png')) {
   if (-not (Test-Path -LiteralPath (Join-Path $root $file) -PathType Leaf)) { throw ('Missing required file: ' + $file) }
 }
 foreach ($id in @('content','top','work','capabilities','approach','contact')) {
@@ -17,8 +17,10 @@ foreach ($required in @('<title>Suzanne Hoey','name="description"','property="og
 }
 if ($html -match 'href="[^"]+\.pdf(?:[#?][^"]*)?"') { throw 'Public portfolio unexpectedly links to a PDF' }
 if ($html -match 'govopportunity\.com|suzanne\.hoey@govopportunity\.com') { throw 'Public portfolio contains retired domain or contact identity' }
-if ($html -match '<link[^>]+rel="canonical"|property="og:url"|property="og:image"|name="twitter:image"') { throw 'Origin-dependent metadata must wait for an approved production origin' }
-if ($html -match 'mailto:') { throw 'Public portfolio contains an unapproved email contact' }
+foreach ($required in @('<link rel="canonical" href="https://suzannehoey.com/">','property="og:url" content="https://suzannehoey.com/"','property="og:image" content="https://suzannehoey.com/assets/portfolio-desktop.png"','name="twitter:image" content="https://suzannehoey.com/assets/portfolio-desktop.png"','href="mailto:business@suzannehoey.com"','"url":"https://suzannehoey.com/"','"email":"mailto:business@suzannehoey.com"')) {
+  if (-not $html.Contains($required)) { throw ('Missing or incorrect production identity: ' + $required) }
+}
+if ([regex]::Matches($html, 'mailto:').Count -ne 2) { throw 'Unexpected email contact reference count' }
 if ($html -match '<script\s+src=') { throw 'Public portfolio unexpectedly loads JavaScript' }
 if ($html -match '<(script|img)[^>]+src="https?://' -or $html -match '<link[^>]+rel="stylesheet"[^>]+href="https?://') { throw 'Unexpected third-party resource reference' }
 if (-not $css.Contains('@media(max-width:640px)')) { throw 'Missing mobile breakpoint' }
@@ -28,7 +30,11 @@ $close = ($css.ToCharArray() | Where-Object { $_ -eq '}' }).Count
 if ($open -ne $close) { throw 'CSS braces are unbalanced' }
 $jsonText = [regex]::Match($html, '<script type="application/ld\+json">\s*(.*?)\s*</script>', 'Singleline').Groups[1].Value
 $null = $jsonText | ConvertFrom-Json
-if ((Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'robots.txt')) -match '(?im)^\s*Sitemap:') { throw 'robots.txt must not claim a sitemap before the production origin is approved' }
+$robots = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'robots.txt')
+if ($robots -notmatch '(?im)^Sitemap: https://suzannehoey\.com/sitemap\.xml$') { throw 'robots.txt is missing the production sitemap URL' }
+$sitemap = Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $root 'sitemap.xml')
+if ($sitemap -notmatch '<loc>https://suzannehoey\.com/</loc>') { throw 'sitemap.xml is missing the production URL' }
+$null = [xml]$sitemap
 git diff --check
 if ($LASTEXITCODE -ne 0) { throw 'Git whitespace validation failed' }
 Write-Output 'portfolio static validation: PASS'

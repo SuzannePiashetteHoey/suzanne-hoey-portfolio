@@ -13,7 +13,7 @@ A fast, accessible, static portfolio presenting Suzanne Hoey's publicly shareabl
 - Responsive layouts for desktop, tablet, and mobile
 - Semantic HTML, keyboard-visible focus, reduced-motion support, and accessible contrast
 - No framework, build step, forms, analytics, cookies, tracking, or third-party requests
-- Origin-independent metadata and structured data, ready for final domain details before release
+- Production metadata and structured data for [suzannehoey.com](https://suzannehoey.com/)
 
 ## Run locally
 
@@ -64,11 +64,11 @@ node tests/browser-acceptance.js 8000 9222 validation-screenshots
 
 The site is intentionally static. Do not add secrets, deployment tokens, private contact records, sensitive research, tracking scripts, or unreviewed third-party embeds. See `docs/SECURITY.md` for the publication boundary.
 
-This standalone repository is not yet published or deployed. Confirm the final domain, public contact address, repository visibility, and deployment configuration before release.
+The approved production identity is `https://suzannehoey.com/`, with public professional inquiries directed to `business@suzannehoey.com`. The site is not yet deployed; review repository visibility and deployment configuration before release.
 
 ## Project status
 
-This is the standalone source repository for Suzanne Hoey’s professional portfolio. This repository has no configured remote or production deployment.
+This is the standalone source repository for Suzanne Hoey’s professional portfolio. The portfolio has no production deployment yet.
 
 ## Rights
 

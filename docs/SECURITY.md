@@ -10,8 +10,8 @@ This repository must remain standalone. Do not import GovOpportunity operational
 
 ## Data collection
 
-The published site has no forms, cookies, analytics, tracking, local storage, or server-side data processing. Email or other external contact links, if added later, are handled by the visitor’s selected external application or service; the portfolio itself does not collect or store submitted information.
+The published site has no forms, cookies, analytics, tracking, local storage, or server-side data processing. The public email link is handled by the visitor’s selected email application or service; the portfolio itself does not collect or store submitted information.
 
 ## Reporting
 
-Do not include suspected sensitive content in a public Git issue. A private security-reporting channel should be added only after an independent, publication-approved contact method is available.
+Do not include suspected sensitive content in a public Git issue. Report portfolio security or privacy concerns privately to `business@suzannehoey.com`, with only the minimum information needed to investigate safely.

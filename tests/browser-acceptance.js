@@ -61,14 +61,14 @@ function pageChecks() {
     hasSkip: !!document.querySelector('.skip-link[href="#content"]'),
     sections: ['work', 'capabilities', 'approach', 'contact'].every(id => !!document.getElementById(id)),
     headings: document.querySelectorAll('h1').length,
-    noMailto: hrefs.every(h => !h || !h.startsWith('mailto:')),
+    approvedMailto: hrefs.filter(h => h && h.startsWith('mailto:')).every(h => h === 'mailto:business@suzannehoey.com') && hrefs.filter(h => h === 'mailto:business@suzannehoey.com').length === 1,
     pdfLinked: hrefs.some(h => h && h.endsWith('.pdf')),
     noHorizontalOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1,
     focusVisible: focus.outlineStyle !== 'none' && focus.outlineWidth !== '0px',
     structuredData: !!document.querySelector('script[type="application/ld+json"]'),
     description: !!document.querySelector('meta[name="description"]'),
-    noOriginMetadata: !document.querySelector('link[rel="canonical"],meta[property="og:url"],meta[property="og:image"],meta[name="twitter:image"]'),
-    safeContact: document.getElementById('contact').textContent.includes('Independent contact coming soon.')
+    productionMetadata: document.querySelector('link[rel="canonical"]')?.href === 'https://suzannehoey.com/' && document.querySelector('meta[property="og:url"]')?.content === 'https://suzannehoey.com/' && document.querySelector('meta[property="og:image"]')?.content === 'https://suzannehoey.com/assets/portfolio-desktop.png' && document.querySelector('meta[name="twitter:image"]')?.content === 'https://suzannehoey.com/assets/portfolio-desktop.png',
+    safeContact: document.getElementById('contact').textContent.includes('business@suzannehoey.com')
   };
 }
 
@@ -81,11 +81,11 @@ async function testViewport(cdp, viewport) {
   assert.equal(result.language, 'en');
   assert.ok(result.hasMain && result.hasNav && result.hasSkip && result.sections);
   assert.equal(result.headings, 1);
-  assert.ok(result.noMailto);
+  assert.ok(result.approvedMailto);
   assert.equal(result.pdfLinked, false);
   assert.ok(result.noHorizontalOverflow);
   assert.ok(result.focusVisible);
-  assert.ok(result.structuredData && result.description && result.noOriginMetadata && result.safeContact);
+  assert.ok(result.structuredData && result.description && result.productionMetadata && result.safeContact);
   if (screenshotDir) {
     fs.mkdirSync(screenshotDir, { recursive: true });
     const dimensions = await evaluate(cdp, '({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight})');
@@ -106,7 +106,7 @@ async function run() {
       { name: 'tablet', width: 768, height: 1024, mobile: true },
       { name: 'mobile', width: 390, height: 844, mobile: true }
     ]) await testViewport(cdp, viewport);
-    const assetExpression = '(async()=>Promise.all(' + JSON.stringify(['styles.css', 'favicon.svg', 'robots.txt', 'assets/portfolio-desktop.png', 'assets/portfolio-mobile.png']) + '.map(name=>fetch(' + JSON.stringify(base + '/') + '+name).then(r=>({ok:r.ok,status:r.status})))))()';
+    const assetExpression = '(async()=>Promise.all(' + JSON.stringify(['styles.css', 'favicon.svg', 'robots.txt', 'sitemap.xml', 'assets/portfolio-desktop.png', 'assets/portfolio-mobile.png']) + '.map(name=>fetch(' + JSON.stringify(base + '/') + '+name).then(r=>({ok:r.ok,status:r.status})))))()';
     const assets = await evaluate(cdp, assetExpression);
     assert.ok(assets.every(asset => asset.ok && asset.status === 200));
     const origins = await evaluate(cdp, "performance.getEntriesByType('resource').map(entry=>new URL(entry.name).origin)");
